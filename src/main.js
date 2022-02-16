@@ -15,9 +15,11 @@ import Stroke from 'ol/style/Stroke';
 import Select from 'ol/interaction/Select';
 // import Fill from 'ol/style/Fill';
 import {layers} from './layers.js'
-import image002 from '../assets/image002.png';
-import image007 from '../assets/image007.png';
+import image002 from '../assets/desks.png';
+import image007 from '../assets/parking.png';
 import seats from '../assets/floor4_properties.json'
+
+import Fill from 'ol/style/Fill';
 
 const typeSelect = document.getElementById('type');
 const featuresWriteBtn = document.getElementById('features-write');
@@ -34,8 +36,7 @@ document.getElementById("features-save").addEventListener('click',(_e) => {
 });
 
 
-
-const createImageLayer = function(imageInfo) {
+const createImageLayer = function(imageInfo, imageLink) {
   const extent = [0,0,imageInfo.width, imageInfo.height];
   const projection = new Projection({
     code: 'xkcd-image',
@@ -46,7 +47,7 @@ const createImageLayer = function(imageInfo) {
   const imageLayer = new ImageLayer({
     source: new Static({
       attributions: '© <a href="https://xkcd.com/license.html">xkcd</a>',
-      url: image002,
+      url: imageLink,
       projection: projection,
       imageExtent: extent,
     })
@@ -63,21 +64,34 @@ const createImageLayer = function(imageInfo) {
   return [imageLayer, imageView];
 }
 
-// let getData = function(url, cb) {
-//   fetch(url)
-//   .then(r => r.json())
-//   .then(r => cb(r))
-// }
-// let seatsJson;
-//
-// getData(seats, data => { seatsJson = data});
+const layerInfoParking = {
+  name: "parking",
+  imageInfo: layers[1],
+  imageLink: image007,
+  features: null,
+}
 
-let [imageLayer, imageView] = createImageLayer(layers[0]);
+const layerInfoFloor = {
+  name: "floor",
+  imageInfo: layers[0],
+  imageLink: image002,
+  features: new GeoJSON().readFeatures(seats),
+}
 
-const source = new VectorSource({
+let layerInfo = layerInfoParking;
+
+let [imageLayer, imageView] = createImageLayer(layerInfo.imageInfo, layerInfo.imageLink);
+
+let source = new VectorSource({
   wrapX: false,
-  features: new GeoJSON().readFeatures(seats)
 });
+
+if(layerInfo.features) {
+  source = new VectorSource({
+    wrapX: false,
+    features: layerInfo.features
+  });
+}
 
 const vector = new VectorLayer({
   source: source,
@@ -95,6 +109,19 @@ const selected = new Style({
     width: 2,
   }),
 });
+
+const bookedStyle = new Style({
+  fill: new Fill({
+    color: "red"
+  })
+});
+
+const availaleStyle = new Style({
+  fill: new Fill({
+    color: "green"
+  })
+});
+  
 function selectStyle(feature) {
   const color = feature.get('COLOR') || '#eeeeee';
   // selected.getFill().setColor(color);
@@ -115,11 +142,6 @@ let displayFeatureInfo = function(pixel) {
     features.push(feature);
   });
   if(features.length > 0) {
-    // if(!features[0].getId()) {
-    //   let featureId = prompt("What whould be the id of this object: ");
-    //   features[0].setId(new String(featureId));
-    // }
-    // features[0].setProperties({"id": "test2"});
     selectedFeature = features[0];
   
     const featureIdTxt = document.querySelector("#featureId");
@@ -134,23 +156,56 @@ let displayFeatureInfo = function(pixel) {
 
     console.log("Selected feature customProperties are ", 
       selectedFeature.getProperties()["properties"]["customId"]);
+      sendMessageToTop("works")
     }
-
-    // let geom = [];
-    // geom.push(new Feature(features[0].getGeometry().clone()));
-
-    // const writer = new GeoJSON();
-    // const geoJsonObj = JSON.parse(writer.writeFeatures(geom));
-    // alert("Selected feature" + JSON.stringify(features[0].getProperties(), null, 2));
   }
 }
 
+let addAvailableStyle = function() {
+    source.forEachFeature(function(feature) {
+    const featureId = feature.getId();
+    let customId;  
+    if(feature.getProperties() && feature.getProperties()['properties']) {
+      customId = feature.getProperties()["properties"]["customId"];
+    }
+    console.log("Feature id is: ", customId);
+    if(customId == 1) {
+      feature.setStyle(availaleStyle);
+    }
+  });
+}
+
+let addBookedStyle = function() {
+   source.forEachFeature(function(feature) {
+   feature.setStyle(bookedStyle);
+  });
+}
+
+addBookedStyle();
+addAvailableStyle();
 map.on('click', function(evt){
      const pixel = evt.pixel
      displayFeatureInfo(pixel)
 });
 
-document.querySelector("#saveId").addEventListener('click', e => {
+document.querySelector("#switchLayer").addEventListener('click', _e => {
+  console.log("Switching layers");
+})
+document.querySelector("#editModeBtn").addEventListener('click', _e => {
+  let controls = document.querySelector("#controls");
+  if(controls.style.display == "none") {
+    controls.style.display = 'flex'
+  } else {
+    controls.style.display = 'none';
+  }
+});
+
+const sendMessageToTop = function(message) {
+  console.log("Sending message to parent");
+  window.top.postMessage(message, "*");
+}
+
+document.querySelector("#saveId").addEventListener('click', _e => {
   console.log("Clicked saved");
   if(!selectedFeature) {
     alert("Please select an object from the map!");
@@ -237,3 +292,9 @@ document.getElementById('undo').addEventListener('click', function () {
 });
 
 addInteraction();
+
+window.onmessage = function(e) {
+  if(e.data == "hello") {
+    alert("It works!");
+  }
+}
