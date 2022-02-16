@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="with=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./src/index.css">
+      
+  <title>Facility app</title>
+  <style>
+    .map {
+      width: 100%;
+      height: 400px;
+    }
+
+    .controls {
+      padding: 5px;
+      display: flex;
+      flex-direction: row;
+    }
+
+    .features {
+      width: 50%;
+      padding: 5px;
+    }
+    .properties {
+      width: 50%;
+      padding: 5px;
+    }
+    .features-content {
+      width: 100%;
+      height: 300px;
+    }
+  </style>
+</head>
+
+<body>
+  
+    <nav
+        class="flex items-center justify-between flex-wrap bg-white pt-4 lg:px-12 shadow border-solid border-t-2 border-blue-700">
+        <div class="flex justify-between lg:w-auto w-full lg:border-b-0 pl-6 pr-2 border-solid border-b-2 border-gray-300 pb-5 lg:pb-0">
+            <div class="flex items-center flex-shrink-0 text-gray-800 mr-16">
+                <span class="font-semibold text-xl tracking-tight">Feature editor</span>
+            </div>
+            <div class="block lg:hidden ">
+                <button
+                    id="nav"
+                    class="flex items-center px-3 py-2 border-2 rounded text-blue-700 border-blue-700 hover:text-blue-700 hover:border-blue-700">
+                    <svg class="fill-current h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><title>Menu</title>
+                        <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    
+        <div class="menu md:hidden w-full lg:block flex-grow lg:flex lg:items-center lg:w-auto lg:px-3 px-8">
+            <div class="text-md font-bold text-blue-700 lg:flex-grow">
+                <a href="#responsive-header"
+                   class="block mt-4 lg:inline-block lg:mt-0 hover:text-white px-4 py-2 rounded hover:bg-blue-700 mr-2">
+                    Layers 
+                </a>
+            </div>
+            <!-- This is an example component -->
+            <div class="relative mx-auto text-gray-600 lg:block hidden">
+                <input
+                    class="border-2 border-gray-300 bg-white h-10 pl-2 pr-8 rounded-lg text-sm focus:outline-none"
+                    type="search" name="search" placeholder="Search">
+                <button type="submit" class="absolute right-0 top-0 mt-3 mr-2">
+                    <svg class="text-gray-600 h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg"
+                         version="1.1" id="Capa_1" x="0px" y="0px"
+                         viewBox="0 0 56.966 56.966" style="enable-background:new 0 0 56.966 56.966;"
+                         xml:space="preserve"
+                         width="512px" height="512px">
+                <path
+                    d="M55.146,51.887L41.588,37.786c3.486-4.144,5.396-9.358,5.396-14.786c0-12.682-10.318-23-23-23s-23,10.318-23,23  s10.318,23,23,23c4.761,0,9.298-1.436,13.177-4.162l13.661,14.208c0.571,0.593,1.339,0.92,2.162,0.92  c0.779,0,1.518-0.297,2.079-0.837C56.255,54.982,56.293,53.08,55.146,51.887z M23.984,6c9.374,0,17,7.626,17,17s-7.626,17-17,17  s-17-7.626-17-17S14.61,6,23.984,6z"/>
+              </svg>
+                </button>
+            </div>
+            <div class="flex ">
+                <a href="#"
+                   class=" block text-md px-4  ml-2 py-2 rounded text-blue-700 font-bold hover:text-white mt-4 hover:bg-blue-700 lg:mt-0">
+                  login</a>
+            </div>
+        </div>
+    </nav>
+
+  <div class="flex hidden bg-blue-10 mx-0 p-4 rounded justify-between text-bold text-blue-600 items-center ">
+    <div class="flex space-x-4 items-center">
+        <svg class="w-4 h-4 flex-none" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <!-- Font Awesome Pro 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) -->
+        <path d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"/></svg>
+        <span>Simple message here</span>
+    </div>
+    <div class="flex space-x-1 items-center">
+        <span>Details</span>
+        <svg class="w-4 h-4" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+            <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z"/>
+        </svg>
+    </div>
+  </div>
+  <!--Map setup-->
+  <div id="map" class="map"></div>
+  <!-- Used for download -->
+  <a id="downloadAnchorElem" style="display:none"></a>
+
+  <div class="controls">
+    <div class="properties">
+      <button class="hidden" id="floor1Btn">Add floor 1 features</button>
+
+      <form class="form-inline">
+        <label for="type">Geometry type: &nbsp;</label>
+        <select class="form-control mr-2 mb-2 mt-2" id="type">
+          <option value="Polygon">Polygon</option>
+          <option value="Point">Point</option>
+          <option value="LineString">LineString</option>
+          <option value="Circle">Circle</option>
+          <option value="None">None</option>
+        </select>
+        <input class="form-control mr-2 mb-2 mt-2" type="button" value="Undo" id="undo">
+      </form>
+        <div> 
+        Features actions
+          <div class="">
+            <label for="featureId" class="mx-3">Id</label>
+            <input class="border border-gray-200" type="text" id="featureId">
+              <!-- &nbsp; -->
+            <!-- <input class="" type="button" value="Save" id="saveId"> -->
+              <!-- &nbsp; -->
+            <!-- <input class="" type="button" value="Delete" id="deleteFeature"> -->
+          </div>
+
+            Properties
+           <div class="">
+            <textarea class="border border-gray-200" 
+              cols="30" rows="5" id="propertiesContent">
+            </textarea>
+          </div>    
+
+              &nbsp;
+            <input class="relative hover:bg-blue-10 bg-blue-500 text-white p-3 px-1" type="button" value="Save" id="saveId">
+              &nbsp;
+            <input class="relative hover:bg-blue-10 bg-blue-500 text-white p-3 px-1" type="button" value="Delete" id="deleteFeature">
+
+        </div>
+    </div>
+
+    <div class="features">
+      <div class="px-1">
+        <button class="relative hover:bg-blue-10 bg-blue-500 text-white p-3 px-1" id="features-write">
+            Write features
+        </button>
+        
+        <button class="relative hover:bg-blue-10 bg-blue-500 text-white p-3 px-1" id="features-save">
+            Save file 
+        </button>
+        <button class="relative hover:bg-blue-10 bg-blue-500 text-white p-3 px-1" id="features-save">
+            Apply json 
+        </button>
+      </div>
+      <div class="my-2 border border-gray-200">
+        <textarea class="features-content">
+        </textarea>
+      </div>
+    </div>
+
+  </div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+
+</html>
