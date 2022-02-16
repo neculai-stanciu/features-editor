@@ -16,8 +16,9 @@ import Select from 'ol/interaction/Select';
 // import Fill from 'ol/style/Fill';
 import {layers} from './layers.js'
 import image002 from '../assets/desks.png';
-import image007 from '../assets/parking.png';
+import image007 from '../assets/image007.png';
 import seats from '../assets/floor4_properties.json'
+import parkingSlots from '../assets/parking.json'
 
 import Fill from 'ol/style/Fill';
 
@@ -65,20 +66,20 @@ const createImageLayer = function(imageInfo, imageLink) {
 }
 
 const layerInfoParking = {
-  name: "parking",
+  name: "floor",
   imageInfo: layers[1],
   imageLink: image007,
-  features: null,
+  features: parkingSlots,
 }
 
 const layerInfoFloor = {
   name: "floor",
   imageInfo: layers[0],
   imageLink: image002,
-  features: new GeoJSON().readFeatures(seats),
+  features: seats,
 }
 
-let layerInfo = layerInfoParking;
+const layerInfo = layerInfoParking;
 
 let [imageLayer, imageView] = createImageLayer(layerInfo.imageInfo, layerInfo.imageLink);
 
@@ -89,7 +90,7 @@ let source = new VectorSource({
 if(layerInfo.features) {
   source = new VectorSource({
     wrapX: false,
-    features: layerInfo.features
+    features: new GeoJSON().readFeatures(layerInfo.features)
   });
 }
 
@@ -189,7 +190,8 @@ map.on('click', function(evt){
 });
 
 document.querySelector("#switchLayer").addEventListener('click', _e => {
-  console.log("Switching layers");
+  layerInfo = 
+  source.changed()
 })
 document.querySelector("#editModeBtn").addEventListener('click', _e => {
   let controls = document.querySelector("#controls");
@@ -198,6 +200,7 @@ document.querySelector("#editModeBtn").addEventListener('click', _e => {
   } else {
     controls.style.display = 'none';
   }
+
 });
 
 const sendMessageToTop = function(message) {
@@ -251,6 +254,9 @@ document.querySelector("#deleteFeature").addEventListener('click', e => {
 featuresWriteBtn.addEventListener('click', (_e) => {
   let geom = [];
   const features = vector.getSource().forEachFeature(function(feature){
+    if(!feature || !feature.getProperties() || !feature.getProperties()['properties']) {
+      console.log("Cannot read properties")
+    }
     const customId = feature.getProperties()["properties"]["customId"];
     const customProperties = feature.getProperties()["properties"]["customProperties"];
 
